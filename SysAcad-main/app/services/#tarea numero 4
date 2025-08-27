@@ -1,0 +1,31 @@
+      from app.services.alumno_service import AlumnoService
+from flask import request, jsonify
+#primero se instalan las bibliotecas para que las funcionalidades puedan andar
+#se crean las funciones a utilizar para que luego con los controladores se puedan utilizar
+
+
+# luego se ceran los controladores para que la funcionalidad pueda ser utilizada dentro del proyecto.
+class AlumnoController:
+    def __init__(self):
+        self.alumno_service = AlumnoService()
+
+    def get_alumno_pdf(self, id):
+        self.alumno_service.generar_pdf(id)
+        return "PDF generado con éxito"
+
+    def get_alumno_json(self, id):
+        data = self.alumno_service.generar_json(id)
+        return jsonify(data)
+        from app.controllers.alumno_controller import AlumnoController
+
+app = Flask(__name__)
+
+alumno_controller = AlumnoController()
+
+@app.route('/alumno/<int:id>/pdf', methods=['GET'])
+def get_alumno_pdf(id):
+    return alumno_controller.get_alumno_pdf(id)
+
+@app.route('/alumno/<int:id>/json', methods=['GET'])
+def get_alumno_json(id):
+    return alumno_controller.get_alumno_json(id)
