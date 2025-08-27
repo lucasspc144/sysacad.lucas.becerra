@@ -1,8 +1,46 @@
-      from app.services.alumno_service import AlumnoService
-from flask import request, jsonify
+
 #primero se instalan las bibliotecas para que las funcionalidades puedan andar
 #se crean las funciones a utilizar para que luego con los controladores se puedan utilizar
+pip install reportlab
+pip install json
+from app.services.alumno_service import AlumnoService
+from flask import request, jsonify
+from app.models.alumno import Alumno
+from app.models.facultad import Facultad
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
+import json
 
+class AlumnoService:
+    def __init__(self):
+        self.alumnos = Alumno.query.all()
+        self.facultades = Facultad.query.all()
+
+    def get_alumno(self, id):
+        return Alumno.query.get(id)
+
+    def get_facultad(self, id):
+        return Facultad.query.get(id)
+
+    def generar_pdf(self, id):
+        alumno = self.get_alumno(id)
+        facultad = self.get_facultad(alumno.facultad_id)
+        c = canvas.Canvas("alumno.pdf", pagesize=letter)
+        c.drawString(100, 750, "Nro de Legajo: " + str(alumno.nro_legajo))
+        c.drawString(100, 700, "Apellido y Nombre: " + alumno.apellido + ", " + alumno.nombre)
+        c.drawString(100, 650, "Facultad: " + facultad.nombre)
+        c.save()
+
+    def generar_json(self, id):
+        alumno = self.get_alumno(id)
+        facultad = self.get_facultad(alumno.facultad_id)
+        data = {
+            "nro_legajo": alumno.nro_legajo,
+            "apellido": alumno.apellido,
+            "nombre": alumno.nombre,
+            "facultad": facultad.nombre
+        }
+        return json.dumps(data)
 
 # luego se ceran los controladores para que la funcionalidad pueda ser utilizada dentro del proyecto.
 class AlumnoController:
